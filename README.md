@@ -103,6 +103,16 @@ Save the file and **refresh the browser page** — the plugin is loaded.
 >
 > If your profile is not named `web`, substitute your profile name; if you set a custom harness home, substitute your `$DSH_HOME` for `~/.dsh`.
 
+**Older profiles** (created by an earlier dsh version) may lack the `autoInstallPeers: false` line in `pnpm-workspace.yaml`. Add it so pnpm never tries to auto-install pre-release peers:
+
+```yaml
+packages:
+  - .
+
+nodeLinker: hoisted
+autoInstallPeers: false
+```
+
 ### 3. Verify
 
 Refresh the GUI page and select a sentence in the chat flow — the **「询问 DeepSeek」** button floats beside the selection. Click it: the text lands in the composer as a quote.
@@ -125,6 +135,7 @@ If you used Path B, also remove the `insert` block from `cordis.patch.yml` (put 
 
 | Symptom | Cause & fix |
 |---|---|
+| `dsh plugin add` fails with `ERR_PNPM_NO_MATCHING_VERSION` for `@deepseek-ai/...` | Your profile is missing the `autoInstallPeers: false` line in `pnpm-workspace.yaml` (older profiles), so pnpm tries to auto-install pre-release peers. Add the line (see below), remove any stray `@deepseek-ai/*` entries from the profile's `package.json` dependencies, delete the profile's `pnpm-lock.yaml`, then re-run. This plugin also marks every peer `optional`, so it never triggers auto-install. |
 | `dsh web` fails to boot: `failed to parse patches` | The insert block was appended after the file's existing `[]`, making the YAML invalid. Replace the `[]` with the block instead (see [Path B](#2-activate-it)). |
 | `dsh web` fails to boot: `duplicate loader entry id: dsh-selection-ask` | The package is registered twice — you used `dsh plugin add` (which adds the bundle) **and** a manual patch row. Remove one of the two. |
 | Installed via `dsh plugin add` but nothing appears after a page refresh | Bundle-list changes are composed at boot — restart `dsh web` (Path A), or use the hot-activation Path B. |

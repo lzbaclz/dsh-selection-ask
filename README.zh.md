@@ -103,6 +103,16 @@ pnpm add github:lzbaclz/dsh-selection-ask
 >
 > 如果你的 profile 不叫 `web`，换成你的 profile 名；自定义了 harness 主目录的话，把 `~/.dsh` 换成你的 `$DSH_HOME`。
 
+**旧版 profile**（由较早版本的 dsh 创建）可能缺少 `pnpm-workspace.yaml` 里的 `autoInstallPeers: false`。补上它，pnpm 就永远不会尝试自动安装预发布版本的 peer：
+
+```yaml
+packages:
+  - .
+
+nodeLinker: hoisted
+autoInstallPeers: false
+```
+
 ### 第 3 步：验证
 
 刷新 GUI 页面，在聊天流里选中一句话——选区旁边应浮出 **「询问 DeepSeek」** 按钮。点击它，文字会以引用形式进入输入框。
@@ -125,6 +135,7 @@ dsh plugin --profile web remove dsh-selection-ask
 
 | 症状 | 原因与解法 |
 |---|---|
+| `dsh plugin add` 失败：`ERR_PNPM_NO_MATCHING_VERSION`，包名是 `@deepseek-ai/...` | 你的 profile 缺少 `pnpm-workspace.yaml` 里的 `autoInstallPeers: false`（旧版 profile），pnpm 尝试自动安装预发布版本（rc）的 peer 依赖而失败。补上这一行（见下文示例）、删掉 profile `package.json` dependencies 里多余的 `@deepseek-ai/*` 条目、删除 profile 的 `pnpm-lock.yaml`，然后重跑。本插件已把所有 peer 标记为 `optional`，因此永远不会触发自动安装。 |
 | `dsh web` 启动失败：`failed to parse patches` | insert 块被追加到了文件原有的 `[]` 后面，YAML 变成非法。把 `[]` 替换成 insert 块（见[路径 B](#第-2-步激活)）。 |
 | `dsh web` 启动失败：`duplicate loader entry id: dsh-selection-ask` | 插件被注册了两次——你既用了 `dsh plugin add`（会加 bundle）又手动加了 patch 行。删掉其中一个。 |
 | 用 `dsh plugin add` 装好后刷新页面没反应 | bundles 列表的变更在启动时才生效——重启 `dsh web`（路径 A），或改用热激活的路径 B。 |
