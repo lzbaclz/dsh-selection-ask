@@ -1,23 +1,16 @@
-<p align="center">
-  <h1 align="center">dsh-selection-ask</h1>
-  <p align="center"><strong>Select it. Quote it. Ask DeepSeek.</strong></p>
-  <p align="center">A ChatGPT-style <em>select → ask</em> button for DeepSeek Harness.</p>
-  <p align="center">
-    <a href="https://github.com/lzbaclz/dsh-selection-ask"><img alt="version" src="https://img.shields.io/github/v/tag/lzbaclz/dsh-selection-ask?label=version&color=4d6bfe"></a>
-    <a href="https://github.com/lzbaclz/dsh-selection-ask/blob/main/LICENSE"><img alt="license" src="https://img.shields.io/github/license/lzbaclz/dsh-selection-ask"></a>
-    <img alt="node" src="https://img.shields.io/badge/node-%5E22.19.0%20%7C%7C%20%3E%3D24-brightgreen">
-    <img alt="dsh" src="https://img.shields.io/badge/dsh-web_plugin-4d6bfe">
-    <a href="https://github.com/lzbaclz/dsh-selection-ask"><img alt="stars" src="https://img.shields.io/github/stars/lzbaclz/dsh-selection-ask?style=social"></a>
-  </p>
-  <p align="center">
-    <a href="./README.zh.md">简体中文</a> ·
-    <a href="#installation">Installation</a> ·
-    <a href="#usage">Usage</a> ·
-    <a href="#development">Development</a> ·
-    <a href="#troubleshooting">Troubleshooting</a> ·
-    <a href="#license">License</a>
-  </p>
-</p>
+# dsh-selection-ask
+
+![banner](assets/banner.png)
+
+[![npm](https://img.shields.io/badge/npm-v0.1.0-cb3837)](https://www.npmjs.com/package/dsh-selection-ask)
+[![license](https://img.shields.io/badge/license-MIT-2fbf8f)](LICENSE)
+[![node](https://img.shields.io/badge/node-%5E22.19%20%7C%7C%20%3E%3D24-5FA04E?logo=nodedotjs)](https://nodejs.org/)
+[![stars](https://img.shields.io/github/stars/lzbaclz/dsh-selection-ask.svg)](https://github.com/lzbaclz/dsh-selection-ask)
+[![dsh plugin](https://img.shields.io/badge/dsh-plugin-4d6bfe)](https://github.com/deepseek-ai/deepseek-harness)
+
+[简体中文](README.zh.md) · [Installation](#installation) · [Usage](#usage) · [Development](#development) · [Troubleshooting](#troubleshooting) · [License](#license)
+
+**Select it. Quote it. Ask DeepSeek.**
 
 DeepSeek Harness is a text-first terminal/agent workspace. But quoting a piece of context back into the chat should be one gesture, not a copy-paste chore. **dsh-selection-ask** gives the web GUI a ChatGPT-style selection helper: select text in a conversation and a floating **「询问 DeepSeek」** button appears beside it. Click it — the selection is quoted into the composer as a Markdown blockquote (`> `), the composer is focused, and the caret is parked at the end. Just type your follow-up and send.
 

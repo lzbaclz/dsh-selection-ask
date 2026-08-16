@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-label="dsh-selection-ask banner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="0.55" stop-color="#0e1630"/>
+      <stop offset="1" stop-color="#12204a"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8fa8ff"/>
+      <stop offset="1" stop-color="#4d6bfe"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.75" cy="0.35" r="0.6">
+      <stop offset="0" stop-color="#4d6bfe" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#4d6bfe" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="360" fill="url(#bg)"/>
+  <rect width="1280" height="360" fill="url(#glow)"/>
+
+  <!-- subtle dot grid -->
+  <g fill="#ffffff" opacity="0.04">
+    <circle cx="60" cy="60" r="1.6"/><circle cx="160" cy="60" r="1.6"/><circle cx="260" cy="60" r="1.6"/>
+    <circle cx="360" cy="60" r="1.6"/><circle cx="460" cy="60" r="1.6"/><circle cx="560" cy="60" r="1.6"/>
+    <circle cx="60" cy="150" r="1.6"/><circle cx="160" cy="150" r="1.6"/><circle cx="260" cy="150" r="1.6"/>
+    <circle cx="360" cy="150" r="1.6"/><circle cx="460" cy="150" r="1.6"/><circle cx="560" cy="150" r="1.6"/>
+    <circle cx="60" cy="240" r="1.6"/><circle cx="160" cy="240" r="1.6"/><circle cx="260" cy="240" r="1.6"/>
+    <circle cx="360" cy="240" r="1.6"/><circle cx="460" cy="240" r="1.6"/><circle cx="560" cy="240" r="1.6"/>
+    <circle cx="60" cy="330" r="1.6"/><circle cx="160" cy="330" r="1.6"/><circle cx="260" cy="330" r="1.6"/>
+    <circle cx="360" cy="330" r="1.6"/><circle cx="460" cy="330" r="1.6"/><circle cx="560" cy="330" r="1.6"/>
+  </g>
+
+  <!-- left: chips + title -->
+  <g font-family="'Helvetica Neue', Helvetica, Arial, 'PingFang SC', sans-serif">
+    <rect x="56" y="60" rx="12" height="24" width="152" fill="#4d6bfe" opacity="0.16"/>
+    <circle cx="74" cy="72" r="3.4" fill="#6f8dff"/>
+    <text x="86" y="77" font-size="12.5" fill="#9db4ff" font-weight="600">DSH · Web Plugin</text>
+
+    <rect x="224" y="60" rx="12" height="24" width="112" fill="#ffffff" opacity="0.08"/>
+    <text x="240" y="77" font-size="12.5" fill="#b8c4e8">zh-CN / EN</text>
+
+    <rect x="352" y="60" rx="12" height="24" width="64" fill="#2fbf8f" opacity="0.16"/>
+    <text x="368" y="77" font-size="12.5" fill="#5fd6ab" font-weight="600">MIT</text>
+
+    <!-- title -->
+    <text x="52" y="158" font-size="37" font-weight="800" fill="url(#title)" letter-spacing="0">dsh-selection-ask</text>
+    <text x="54" y="198" font-size="19" font-weight="600" fill="#dfe6ff">选中即问 · Select &amp; Ask</text>
+    <text x="54" y="234" font-size="14.5" fill="#93a2cc">Select it. Quote it. Ask DeepSeek.</text>
+    <text x="54" y="258" font-size="14.5" fill="#6d7ba3">A ChatGPT-style select → ask button for DeepSeek Harness Web.</text>
+  </g>
+
+  <!-- right: app window illustration -->
+  <g transform="translate(716 34)">
+    <!-- window frame -->
+    <rect x="0" y="0" width="516" height="292" rx="16" fill="#0d1428" stroke="#22315c" stroke-width="1.5"/>
+    <rect x="0" y="0" width="516" height="34" rx="16" fill="#101a34"/>
+    <rect x="0" y="18" width="516" height="16" fill="#101a34"/>
+    <circle cx="22" cy="17" r="5" fill="#ff5f57"/>
+    <circle cx="42" cy="17" r="5" fill="#febc2e"/>
+    <circle cx="62" cy="17" r="5" fill="#28c840"/>
+    <rect x="140" y="10" width="236" height="14" rx="7" fill="#1b2a52"/>
+
+    <!-- chat bubbles -->
+    <rect x="30" y="56" width="196" height="30" rx="10" fill="#16224a"/>
+    <rect x="30" y="94" width="146" height="30" rx="10" fill="#16224a"/>
+
+    <!-- selected bubble (highlighted) -->
+    <rect x="30" y="132" width="216" height="30" rx="10" fill="#16224a"/>
+    <rect x="56" y="128" width="166" height="38" rx="10" fill="#4d6bfe" opacity="0.28"/>
+    <rect x="54" y="126" width="170" height="42" rx="12" fill="none" stroke="#6f8dff" stroke-width="2.4"/>
+    <rect x="52" y="136" width="3.4" height="22" rx="1.7" fill="#9db4ff"/>
+    <rect x="224" y="136" width="3.4" height="22" rx="1.7" fill="#9db4ff"/>
+
+    <!-- floating 「询问 DeepSeek」 button above the selection -->
+    <ellipse cx="146" cy="127" rx="56" ry="6" fill="#000000" opacity="0.30"/>
+    <rect x="74" y="88" width="144" height="32" rx="16" fill="#f2f5ff" stroke="#94a6ff" stroke-width="1.4"/>
+    <circle cx="92" cy="104" r="4.2" fill="#4d6bfe"/>
+    <text x="104" y="109" font-size="13.5" font-weight="700" fill="#1f2329">询问 DeepSeek</text>
+
+    <!-- assistant continuation -->
+    <rect x="30" y="182" width="322" height="16" rx="8" fill="#1d2b58"/>
+    <rect x="30" y="204" width="282" height="16" rx="8" fill="#1d2b58"/>
+
+    <!-- composer with quoted text -->
+    <rect x="30" y="242" width="456" height="38" rx="12" fill="#111a38" stroke="#26386e" stroke-width="1.4"/>
+    <rect x="42" y="250" width="4" height="22" rx="2" fill="#4d6bfe"/>
+    <text x="54" y="266" font-size="12.5" fill="#8fa8ff">&gt; 为什么贸易顺差没有变成外储增加？</text>
+    <rect x="252" y="253" width="2" height="16" fill="#dfe6ff"/>
+    <circle cx="462" cy="261" r="12" fill="#4d6bfe"/>
+    <path d="M457 261 l5 4 l-5 4 z" fill="#ffffff"/>
+
+    <!-- dashed hint: click → quoted into composer -->
+    <path d="M146 122 C 146 182, 120 210, 88 240" fill="none" stroke="#4d6bfe" stroke-width="1.4" stroke-dasharray="4 6" opacity="0.55"/>
+    <circle cx="88" cy="240" r="3" fill="#4d6bfe" opacity="0.8"/>
+  </g>
+</svg>

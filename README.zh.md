@@ -1,23 +1,16 @@
-<p align="center">
-  <h1 align="center">dsh-selection-ask</h1>
-  <p align="center"><strong>选中即引用，一键问 DeepSeek。</strong></p>
-  <p align="center">为 DeepSeek Harness 打造的 ChatGPT 式「选中 → 询问」悬浮按钮插件。</p>
-  <p align="center">
-    <a href="https://github.com/lzbaclz/dsh-selection-ask"><img alt="version" src="https://img.shields.io/github/v/tag/lzbaclz/dsh-selection-ask?label=version&color=4d6bfe"></a>
-    <a href="https://github.com/lzbaclz/dsh-selection-ask/blob/main/LICENSE"><img alt="license" src="https://img.shields.io/github/license/lzbaclz/dsh-selection-ask"></a>
-    <img alt="node" src="https://img.shields.io/badge/node-%5E22.19.0%20%7C%7C%20%3E%3D24-brightgreen">
-    <img alt="dsh" src="https://img.shields.io/badge/dsh-web_plugin-4d6bfe">
-    <a href="https://github.com/lzbaclz/dsh-selection-ask"><img alt="stars" src="https://img.shields.io/github/stars/lzbaclz/dsh-selection-ask?style=social"></a>
-  </p>
-  <p align="center">
-    <a href="./README.md">English</a> ·
-    <a href="#安装">安装</a> ·
-    <a href="#使用方法">使用方法</a> ·
-    <a href="#开发">开发</a> ·
-    <a href="#故障排查">故障排查</a> ·
-    <a href="#许可证">许可证</a>
-  </p>
-</p>
+# dsh-selection-ask
+
+![banner](assets/banner.png)
+
+[![npm](https://img.shields.io/badge/npm-v0.1.0-cb3837)](https://www.npmjs.com/package/dsh-selection-ask)
+[![license](https://img.shields.io/badge/license-MIT-2fbf8f)](LICENSE)
+[![node](https://img.shields.io/badge/node-%5E22.19%20%7C%7C%20%3E%3D24-5FA04E?logo=nodedotjs)](https://nodejs.org/)
+[![stars](https://img.shields.io/github/stars/lzbaclz/dsh-selection-ask.svg)](https://github.com/lzbaclz/dsh-selection-ask)
+[![dsh plugin](https://img.shields.io/badge/dsh-plugin-4d6bfe)](https://github.com/deepseek-ai/deepseek-harness)
+
+[English](README.md) · [安装](#安装) · [使用方法](#使用方法) · [开发](#开发) · [故障排查](#故障排查) · [许可证](#许可证)
+
+**选中即引用，一键问 DeepSeek。**
 
 DeepSeek Harness 是一个以文本为先的终端 / agent 工作台，但「把上下文引用回对话」本该是一个手势，而不是复制粘贴的苦工。**dsh-selection-ask** 给 Web GUI 加上 ChatGPT 式的选区助手：在会话聊天流里**选中一段文字**，选区旁边就会浮出 **「询问 DeepSeek」** 按钮。点击它——选中文字即以 Markdown 引用（`> ` 前缀）写入输入框，输入框自动聚焦、光标停在末尾，直接打字追问即可。
 
