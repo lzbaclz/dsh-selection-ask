@@ -35,11 +35,9 @@ DeepSeek Harness 是一个以文本为先的终端 / agent 工作台，但「把
 
 ## 安装
 
-### 第 1 步：把包装进你的 web profile
+### 第 1 步：安装包
 
-以下三种方式**任选其一**：
-
-**A. 从 GitHub 安装（推荐）**
+**从 GitHub 安装（推荐）**
 
 ```bash
 dsh plugin --profile web add github:lzbaclz/dsh-selection-ask
@@ -47,38 +45,62 @@ dsh plugin --profile web add github:lzbaclz/dsh-selection-ask
 
 想固定版本可指定 tag：`dsh plugin --profile web add github:lzbaclz/dsh-selection-ask#v0.1.0`
 
-**B. 从本地克隆安装**
+**从本地克隆安装**
 
 ```bash
 git clone https://github.com/lzbaclz/dsh-selection-ask.git
 dsh plugin --profile web add link:/绝对路径/dsh-selection-ask
 ```
 
-**C. 从 npm 安装** *（尚未发布；发布后 `dsh plugin --profile web add dsh-selection-ask` 即可用，见[路线图](#路线图)）*
+**从 npm 安装** *（尚未发布；发布后 `dsh plugin --profile web add dsh-selection-ask` 即可用，见[路线图](#路线图)）*
 
-`dsh plugin` 会把参数原样转发给 profile 目录（`~/.dsh/profiles/<profile>`）里的 pnpm，所以任何 `pnpm add` 写法都支持。
+### 第 2 步：激活
 
-### 第 2 步：把插件挂进 profile 组合
+`dsh plugin add` 会把包自动登记进 profile 的 `dsh.profile.bundles` 列表，而本包自带 `cordis.patch.yml`，因此条目行会在**启动时自动插入**。下面两种激活路径**二选一，绝不要同时用**。
 
-插件自带 `cordis.patch.yml`（一行 `insert`），但该行只有在包被列入 `dsh.profile.bundles` 时才会在启动时自动应用。下面两种方式**二选一，不要同时用**（同时用会重复注册）。
+**路径 A —— 重启（零 YAML 编辑；新安装推荐）**
 
-**方式 A —— profile patch 层（热应用、无需重启；推荐）**
+重启 `dsh web`（如果还没启动就正常启动）。完成——不需要改任何配置文件。
 
-把下面这段追加到 `~/.dsh/profiles/web/cordis.patch.yml`：
+```bash
+# 停掉你的 dsh web 进程，然后：
+dsh web
+```
+
+**路径 B —— 运行中的服务器热激活（不重启）**
+
+直接用 `pnpm`（**不要用** `dsh plugin`，因为它会把包登记进 bundles），保持 bundles 列表不动，然后改 profile 的 patch 层——DSH 实时监听该文件并热应用：
+
+```bash
+cd ~/.dsh/profiles/web
+pnpm add github:lzbaclz/dsh-selection-ask
+```
+
+然后打开 `~/.dsh/profiles/web/cordis.patch.yml`，把 `[]` **替换**成 insert 块——文件必须保持合法的 YAML 列表：
 
 ```yaml
+# 改之前：
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+[]
+
+# 改之后：
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
 - insert:
     - id: dsh-selection-ask
       name: dsh-selection-ask
       config: {}
 ```
 
-DSH 会实时监听这个文件并热应用该行。**刷新浏览器页面**，插件即已加载。
+保存文件并**刷新浏览器页面**——插件已加载。
 
-**方式 B —— bundles 列表（启动时组合，需重启）**
-
-把 `"dsh-selection-ask"` 加进 `~/.dsh/profiles/web/package.json` 里的 `dsh.profile.bundles` 数组，然后重启 `dsh web`。插件包自带的 `cordis.patch.yml` 会在启动时自动插入那一行。
-
+> ⚠️ **不要把路径 A 和路径 B 混用**（比如 `dsh plugin add` 之后又手动加 patch 行）：条目会被注册两次，`dsh web` 启动失败，报 `duplicate loader entry id: dsh-selection-ask`。
+>
+> ⚠️ **不要"追加"** YAML 块到已有的 `[]` 后面——那会变成非法文件，`dsh web` 启动失败，报 `failed to parse patches`。请按上面示范把 `[]` 替换掉。
+>
 > 如果你的 profile 不叫 `web`，换成你的 profile 名；自定义了 harness 主目录的话，把 `~/.dsh` 换成你的 `$DSH_HOME`。
 
 ### 第 3 步：验证
@@ -97,16 +119,19 @@ DSH 会实时监听这个文件并热应用该行。**刷新浏览器页面**，
 dsh plugin --profile web remove dsh-selection-ask
 ```
 
-同时删除 `cordis.patch.yml` 里的 `insert` 行（方式 A）或 `dsh.profile.bundles` 里的条目（方式 B），然后刷新 / 重启。
+如果你用的是路径 B，还要把 `cordis.patch.yml` 里的 `insert` 块删掉（还原成 `[]`），然后刷新 / 重启。
 
 ## 故障排查
 
 | 症状 | 原因与解法 |
 |---|---|
-| 选中文字后按钮始终不出现 | 选区不在聊天流内（试试选一条聊天消息的文字）；或安装后没刷新页面；或 `cordis.patch.yml` 里的 `insert` 行缺失 / 重复。 |
+| `dsh web` 启动失败：`failed to parse patches` | insert 块被追加到了文件原有的 `[]` 后面，YAML 变成非法。把 `[]` 替换成 insert 块（见[路径 B](#第-2-步激活)）。 |
+| `dsh web` 启动失败：`duplicate loader entry id: dsh-selection-ask` | 插件被注册了两次——你既用了 `dsh plugin add`（会加 bundle）又手动加了 patch 行。删掉其中一个。 |
+| 用 `dsh plugin add` 装好后刷新页面没反应 | bundles 列表的变更在启动时才生效——重启 `dsh web`（路径 A），或改用热激活的路径 B。 |
+| 选中文字后按钮始终不出现 | 选区不在聊天流内（试试选一条聊天消息的文字）；或激活后没刷新页面；或 `insert` 行缺失。 |
 | 按钮出现但点击无效 | 浏览器缓存了旧 bundle——强制刷新页面（Cmd/Ctrl+Shift+R）。若本地重新构建过，先 `pnpm build` 再重新 `link:`。 |
 | 出现提问卡片时按钮消失 | 属预期行为：overlay 随默认输入条在接管状态下一起隐藏，接管结束后恢复。 |
-| `dsh plugin add` 失败 | 任何 pnpm 写法都支持（`link:`、`github:`、tarball URL）。检查 profile 路径是否在 `~/.dsh/profiles/` 下。 |
+| `dsh plugin add` 失败 | 任何 pnpm 写法都支持（`link:`、`github:`、tarball URL）。检查 profile 路径是否在 `~/.dsh/profiles/` 下，以及 Node 版本。 |
 
 ## 开发
 

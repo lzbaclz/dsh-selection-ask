@@ -18,7 +18,7 @@ DeepSeek Harness is a text-first terminal/agent workspace. But quoting a piece o
 
 - **Zero friction quoting** — the exact gesture you know from ChatGPT, in DeepSeek Harness.
 - **Official integration, no hacks** — writes through the harness's `inputActions.setDraft` input-machine API, so undo history and draft persistence keep working. It never touches DSH internals or DOM state directly.
-- **One command to install** — the compiled `lib/` is committed, so `dsh plugin add` from GitHub works without any build step.
+- **One command to install** — the compiled `lib/` is committed, so a `github:` install fetches ready-to-load artifacts with no build step.
 
 ## Features
 
@@ -35,11 +35,9 @@ DeepSeek Harness is a text-first terminal/agent workspace. But quoting a piece o
 
 ## Installation
 
-### 1. Install the package into your web profile
+### 1. Install the package
 
-Pick **one**:
-
-**A. From GitHub (recommended)**
+**From GitHub (recommended)**
 
 ```bash
 dsh plugin --profile web add github:lzbaclz/dsh-selection-ask
@@ -47,38 +45,62 @@ dsh plugin --profile web add github:lzbaclz/dsh-selection-ask
 
 Pin a release for reproducibility: `dsh plugin --profile web add github:lzbaclz/dsh-selection-ask#v0.1.0`
 
-**B. From a local clone**
+**From a local clone**
 
 ```bash
 git clone https://github.com/lzbaclz/dsh-selection-ask.git
 dsh plugin --profile web add link:/absolute/path/to/dsh-selection-ask
 ```
 
-**C. From npm** *(not published yet — `dsh plugin --profile web add dsh-selection-ask` will work once it is; see [Roadmap](#roadmap))*
+**From npm** *(not published yet — `dsh plugin --profile web add dsh-selection-ask` will work once it is; see [Roadmap](#roadmap))*
 
-`dsh plugin` forwards to pnpm inside your profile directory (`~/.dsh/profiles/<profile>`), so any `pnpm add` specifier works.
+### 2. Activate it
 
-### 2. Mount the plugin into the profile composition
+`dsh plugin add` already registers the package in your profile's `dsh.profile.bundles` list, and this package ships its own `cordis.patch.yml`, so the entry row is inserted **automatically at boot**. Choose **one** of the two activation paths — **never both**.
 
-The plugin ships its own `cordis.patch.yml` (a one-row `insert`), but that row is applied automatically only when the package is listed in `dsh.profile.bundles`. Choose **one** of the two ways — **not both**, or the entry gets registered twice.
+**Path A — restart (zero YAML editing; recommended for new setups)**
 
-**Option A — profile patch layer (hot-applied, no restart; recommended)**
+Restart `dsh web` (or just start it if it is not running). Done — no config files to edit.
 
-Append this to `~/.dsh/profiles/web/cordis.patch.yml`:
+```bash
+# stop your dsh web process, then:
+dsh web
+```
+
+**Path B — hot activation on a running server (no restart)**
+
+Use raw `pnpm` (not `dsh plugin`, which would also register the bundle) so the bundles list is untouched, then patch the profile's patch layer, which DSH watches and applies live:
+
+```bash
+cd ~/.dsh/profiles/web
+pnpm add github:lzbaclz/dsh-selection-ask
+```
+
+Now open `~/.dsh/profiles/web/cordis.patch.yml` and **replace** the `[]` with the insert block — the file must stay a valid YAML list:
 
 ```yaml
+# BEFORE:
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+[]
+
+# AFTER:
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
 - insert:
     - id: dsh-selection-ask
       name: dsh-selection-ask
       config: {}
 ```
 
-DSH watches this file and applies the row live. Refresh the browser page and the plugin is loaded.
+Save the file and **refresh the browser page** — the plugin is loaded.
 
-**Option B — bundle list (boot-composed, needs a restart)**
-
-Add `"dsh-selection-ask"` to the `dsh.profile.bundles` array in `~/.dsh/profiles/web/package.json`, then restart `dsh web`. The package's own `cordis.patch.yml` inserts the row at boot.
-
+> ⚠️ **Do not combine Path A and Path B** (e.g. `dsh plugin add` + a manual patch row): the entry would be registered twice and `dsh web` fails to boot with `duplicate loader entry id: dsh-selection-ask`.
+>
+> ⚠️ **Do not append** the YAML block after an existing `[]` — that produces an invalid file and `dsh web` fails to boot with `failed to parse patches`. Replace the `[]` as shown above.
+>
 > If your profile is not named `web`, substitute your profile name; if you set a custom harness home, substitute your `$DSH_HOME` for `~/.dsh`.
 
 ### 3. Verify
@@ -97,16 +119,19 @@ Refresh the GUI page and select a sentence in the chat flow — the **「询问 
 dsh plugin --profile web remove dsh-selection-ask
 ```
 
-Also remove the `insert` row from `cordis.patch.yml` (Option A) or the `dsh.profile.bundles` entry (Option B), then refresh / restart.
+If you used Path B, also remove the `insert` block from `cordis.patch.yml` (put the `[]` back), then refresh / restart.
 
 ## Troubleshooting
 
 | Symptom | Cause & fix |
 |---|---|
-| Button never appears after selecting text | Selection is outside the transcript (try selecting a chat message), or the page hasn't been refreshed since install, or the `insert` row is missing / duplicated in `cordis.patch.yml`. |
+| `dsh web` fails to boot: `failed to parse patches` | The insert block was appended after the file's existing `[]`, making the YAML invalid. Replace the `[]` with the block instead (see [Path B](#2-activate-it)). |
+| `dsh web` fails to boot: `duplicate loader entry id: dsh-selection-ask` | The package is registered twice — you used `dsh plugin add` (which adds the bundle) **and** a manual patch row. Remove one of the two. |
+| Installed via `dsh plugin add` but nothing appears after a page refresh | Bundle-list changes are composed at boot — restart `dsh web` (Path A), or use the hot-activation Path B. |
+| Button never appears after selecting text | Selection is outside the transcript (try selecting a chat message), the page wasn't refreshed after activation, or the `insert` row is missing. |
 | Button appears but click does nothing | An outdated bundle is cached — hard-refresh the page (Cmd/Ctrl+Shift+R). If the package was rebuilt locally, re-run `pnpm build` and re-`link:` it. |
 | Button gone while a question card is showing | Expected: the overlay hides with the default composer under a takeover. It returns when the default composer does. |
-| `dsh plugin add` fails | Any pnpm specifier works (`link:`, `github:`, tarball URL). Check the profile path under `~/.dsh/profiles/`. |
+| `dsh plugin add` fails | Any pnpm specifier works (`link:`, `github:`, tarball URL). Check the profile path under `~/.dsh/profiles/` and your Node version. |
 
 ## Development
 
