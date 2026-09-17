@@ -177,7 +177,8 @@ cd dsh-selection-ask
 pnpm install
 pnpm typecheck   # host + client 两段 tsc，零错误
 pnpm build       # tsc(host) + tsc(client) + tsdown 打包
-pnpm verify      # 对构建产物做离线冒烟校验
+pnpm verify      # 离线冒烟：manifest/exports/patch/产物形状
+pnpm test:dom    # 无头 DOM 测试：jsdom 里挂载真实组件，断言选区→引用→写入草稿      # 对构建产物做离线冒烟校验
 ```
 
 - `src/index.ts` —— host 半（空 `apply`；它的存在是为了让服务器插件名册扫描到本包）。

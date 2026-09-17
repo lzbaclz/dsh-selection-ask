@@ -179,7 +179,8 @@ cd dsh-selection-ask
 pnpm install
 pnpm typecheck   # host + client tsc programs, zero errors
 pnpm build       # tsc(host) + tsc(client) + tsdown bundle
-pnpm verify      # offline smoke checks over the built artifacts
+pnpm verify      # offline smoke: manifest/exports/patch/bundle shape
+pnpm test:dom    # headless DOM test: mounts the built button in jsdom and asserts the quote flow      # offline smoke checks over the built artifacts
 ```
 
 - `src/index.ts` — host half (empty `apply`; exists so the roster scan finds the package).
