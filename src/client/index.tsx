@@ -1,10 +1,13 @@
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 // Type-only module loads so their declaration merges apply in this program:
 // - ui-conversation merges `useInput`/`inputActions` into SessionStandardProps;
-// - ui-input-trigger declares the `conversation.input.overlay` SlotMap entry.
-// Both are erased at compile time (purity gate).
+// - ui-input-trigger declares the `conversation.input.overlay` SlotMap entry;
+// - ui-renderer owns the `ctx.slots` service declaration (0.1.5-rc.2 moved it
+//   out of the retired dsh-client-runtime).
+// All are erased at compile time (purity gate).
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-input-trigger/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { SelectionAskButton } from './SelectionAskButton.tsx'
 import { injectStyle } from './styles.ts'
 

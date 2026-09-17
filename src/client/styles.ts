@@ -1,4 +1,4 @@
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 
 /**
  * Floating 「询问 DeepSeek」 button CSS. Plain CSS string injected via an
