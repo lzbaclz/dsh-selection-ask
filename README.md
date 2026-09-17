@@ -34,7 +34,13 @@ DeepSeek Harness is a text-first terminal/agent workspace. But quoting a piece o
 - A browser page on the harness GUI (`http://127.0.0.1:3080` by default).
 - Building from source needs Node `^22.19.0 || >=24` and pnpm. **Installing the prebuilt package does not** (compiled `lib/` is committed).
 
-## Installation
+## Install
+
+> **Requirements**: DSH ≥ `0.1.5-rc.2` (the current `next` channel / the DSH
+> Desktop app). The 0.1.5 line moved the Chat node graph into a session-scoped
+> store, so older hosts need the previous plugin release (see the version table
+> below).
+ation
 
 ### 1. Install the package
 
@@ -117,6 +123,17 @@ autoInstallPeers: false
 ### 3. Verify
 
 Refresh the GUI page and select a sentence in the chat flow — the **「询问 DeepSeek」** button floats beside the selection. Click it: the text lands in the composer as a quote.
+
+### Upgrade & hot reload
+
+```sh
+dsh plugin --profile web add dsh-selection-ask@latest   # fetch the new version
+```
+
+The DSH client-plugin HMR chain watches plugin bundles and reloads them: after an
+upgrade you normally need neither an app restart nor a page refresh. Every side
+effect (style tag, locale dictionaries, slot registrations) is owned by the plugin
+fiber, so a hot reload never leaves stale code behind.
 
 ## Usage
 
