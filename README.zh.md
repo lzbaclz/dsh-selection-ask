@@ -44,15 +44,24 @@ DeepSeek Harness 是一个以文本为先的终端 / agent 工作台，但「把
 > | `0.1.0` | DSH `0.1.0-rc.x`（`dsh-client-runtime` 时代） |
 
 
+> **用 DSH Desktop 桌面版？** 在应用内终端执行同样的命令、**不用写 `--profile`**
+> （会自动指向 `desktop` profile）。首次安装需要重启一次；以后升级走热更新，无需重启。
+
 ### 第 1 步：安装包
 
-**从 GitHub 安装（推荐）**
+**从 npm 安装（推荐，一条命令）**
+
+```bash
+dsh plugin --profile web add dsh-selection-ask
+```
+
+**从 GitHub 安装**（最新提交，无需构建）
 
 ```bash
 dsh plugin --profile web add github:lzbaclz/dsh-selection-ask
 ```
 
-想固定版本可指定 tag：`dsh plugin --profile web add github:lzbaclz/dsh-selection-ask#v0.1.0`
+想固定版本可指定 tag：`dsh plugin --profile web add github:lzbaclz/dsh-selection-ask#v0.1.1`
 
 **从本地克隆安装**
 
@@ -60,8 +69,6 @@ dsh plugin --profile web add github:lzbaclz/dsh-selection-ask
 git clone https://github.com/lzbaclz/dsh-selection-ask.git
 dsh plugin --profile web add link:/绝对路径/dsh-selection-ask
 ```
-
-**从 npm 安装** *（尚未发布；发布后 `dsh plugin --profile web add dsh-selection-ask` 即可用，见[路线图](#路线图)）*
 
 ### 第 2 步：激活
 
@@ -195,7 +202,7 @@ pnpm test:dom    # 无头 DOM 测试：jsdom 里挂载真实组件，断言选�
 
 ## 路线图
 
-- [ ] 发布到 npm（`dsh plugin --profile web add dsh-selection-ask`）。
+- [x] 发布到 npm（`dsh plugin --profile web add dsh-selection-ask`）—— 0.1.1 已上架。
 - [ ] 可选快捷键（如 ⌘⇧Q）一键引用当前选区。
 - [ ] 按钮文案 / 语言可配置。
 

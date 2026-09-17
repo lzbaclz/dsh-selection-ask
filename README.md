@@ -44,15 +44,26 @@ DeepSeek Harness is a text-first terminal/agent workspace. But quoting a piece o
 > | `0.1.0` | DSH `0.1.0-rc.x` (the `dsh-client-runtime` era) |
 ation
 
+> **Using the DSH Desktop app?** Run the same command in the app's built-in
+> terminal **without `--profile`** — it targets the `desktop` profile
+> automatically. The first install needs one restart of that DSH; later upgrades
+> hot-reload (no restart).
+
 ### 1. Install the package
 
-**From GitHub (recommended)**
+**From npm (recommended — one command)**
+
+```bash
+dsh plugin --profile web add dsh-selection-ask
+```
+
+**From GitHub** (latest commit, no build step needed)
 
 ```bash
 dsh plugin --profile web add github:lzbaclz/dsh-selection-ask
 ```
 
-Pin a release for reproducibility: `dsh plugin --profile web add github:lzbaclz/dsh-selection-ask#v0.1.0`
+Pin a release for reproducibility: `dsh plugin --profile web add github:lzbaclz/dsh-selection-ask#v0.1.1`
 
 **From a local clone**
 
@@ -60,8 +71,6 @@ Pin a release for reproducibility: `dsh plugin --profile web add github:lzbaclz/
 git clone https://github.com/lzbaclz/dsh-selection-ask.git
 dsh plugin --profile web add link:/absolute/path/to/dsh-selection-ask
 ```
-
-**From npm** *(not published yet — `dsh plugin --profile web add dsh-selection-ask` will work once it is; see [Roadmap](#roadmap))*
 
 ### 2. Activate it
 
