@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { CSSProperties, ReactElement } from 'react'
+import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { appendQuote, buildQuote } from './quote.ts'
 
@@ -22,16 +22,21 @@ interface ButtonPos {
   left: number
 }
 
-/** Gap (px) between the selection edge and the button. */
+/** Surface mode: the quote pill, or the in-place compose card. */
+type SurfaceMode = 'pill' | 'compose'
+
+/** Gap (px) between the selection edge and the floating surface. */
 const GAP = 8
-/** Viewport edge padding (px) used when clamping the button position. */
+/** Viewport edge padding (px) used when clamping the floating position. */
 const MARGIN = 8
 
 /**
  * Read the current DOM selection when it qualifies for quoting: non-empty,
- * inside the conversation transcript (`[data-conversation-scroll]`), but NOT
- * inside the composer card (quoting the draft back into itself is nonsense).
- * Returns null otherwise — including selections scrolled fully off-screen.
+ * inside the conversation transcript (`[data-conversation-scroll]`) OR inside
+ * an in-app document preview (`[data-document-preview]` / the rendered
+ * markdown body / a text preview tab), but NOT inside the composer card
+ * (quoting the draft back into itself is nonsense). Returns null otherwise —
+ * including selections scrolled fully off-screen.
  */
 function readSelection(): SelectionState | null {
   const selection = window.getSelection()
@@ -48,7 +53,12 @@ function readSelection(): SelectionState | null {
       : ancestor.parentElement
   if (!node) return null
 
-  if (!node.closest('[data-conversation-scroll]')) return null
+  const inTranscript = node.closest('[data-conversation-scroll]')
+  const inDocPreview =
+    node.closest('[data-document-preview]') ||
+    node.closest('[data-document-markdown]') ||
+    node.closest('[data-textpreview-state]')
+  if (!inTranscript && !inDocPreview) return null
   if (node.closest('[data-composer-card]')) return null
 
   const rect = range.getBoundingClientRect()
@@ -66,10 +76,16 @@ function readSelection(): SelectionState | null {
 }
 
 /**
- * The floating 「询问 DeepSeek」 button. Rendered inside the composer's
+ * The floating 「询问 DeepSeek」 surface. Rendered inside the composer's
  * `conversation.input.overlay` anchor (a zero-height absolute node); the
- * button escapes it with `position: fixed` and floats over the transcript at
+ * surface escapes it with `position: fixed` and floats over the transcript at
  * viewport coordinates derived from the selection rect.
+ *
+ * Clicking the pill transforms it in place into a small compose card: the
+ * selection is pre-quoted into the textarea, the user types the follow-up
+ * right there, and Enter saves it onto the resident composer draft
+ * (`setDraft` only — never auto-sends) so several selections can
+ * accumulate before one manual send.
  */
 export function SelectionAskButton({
   useInput,
@@ -77,16 +93,23 @@ export function SelectionAskButton({
 }: SelectionAskProps): ReactElement | null {
   const draft = useInput((s) => s.draft)
   const [sel, setSel] = useState<SelectionState | null>(null)
+  const [mode, setMode] = useState<SurfaceMode>('pill')
   const [pos, setPos] = useState<ButtonPos | null>(null)
-  const buttonRef = useRef<HTMLButtonElement | null>(null)
+  const [text, setText] = useState('')
+  const pillRef = useRef<HTMLButtonElement | null>(null)
+  const cardRef = useRef<HTMLDivElement | null>(null)
+  // Compose guards selection tracking: edits inside the card must not let a
+  // stray selectionchange swap the surface back to the pill mid-typing.
+  const composingRef = useRef(false)
 
   const updateSelection = useCallback(() => {
+    if (composingRef.current) return
     setSel(readSelection())
   }, [])
 
   // Track selection lifecycle: drag-release, keyboard selection, programmatic
-  // clears (selectionchange), plus scroll/resize so the fixed button tracks the
-  // selection rect and hides once it leaves the viewport.
+  // clears (selectionchange), plus scroll/resize so the fixed surface tracks
+  // the selection rect and hides once it leaves the viewport.
   useEffect(() => {
     document.addEventListener('selectionchange', updateSelection)
     document.addEventListener('mouseup', updateSelection)
@@ -105,10 +128,12 @@ export function SelectionAskButton({
     }
   }, [updateSelection])
 
-  // Measure the rendered button, then clamp its position into the viewport.
-  // Runs before paint, so the off-screen measuring frame is never shown.
+  // Measure the rendered surface (pill or card), then clamp its position into
+  // the viewport. Runs before paint, so the off-screen measuring frame is
+  // never shown.
   useLayoutEffect(() => {
-    const el = buttonRef.current
+    const el: HTMLElement | null =
+      mode === 'compose' ? cardRef.current : pillRef.current
     if (!sel || !el) {
       setPos(null)
       return
@@ -121,26 +146,57 @@ export function SelectionAskButton({
     left = Math.min(Math.max(MARGIN, left), window.innerWidth - w - MARGIN)
     top = Math.min(Math.max(MARGIN, top), window.innerHeight - h - MARGIN)
     setPos({ top, left })
-  }, [sel])
+  }, [sel, mode])
 
-  const writeQuote = useCallback(() => {
-    if (!sel) return
-    const next = appendQuote(draft, buildQuote(sel.text))
-    inputActions.setDraft(next) // full-draft replace (session standard kit)
-    window.getSelection()?.removeAllRanges()
-    setSel(null)
-    setPos(null)
-    // Wait a frame for the controlled textarea to re-render with the new
-    // draft, then focus it and park the caret at the end.
-    requestAnimationFrame(() => {
-      const ta = document.querySelector<HTMLTextAreaElement>(
-        '[data-composer-card] textarea',
-      )
-      if (!ta) return
+  // Focus the card textarea the moment compose mounts; caret parked at the
+  // end of the pre-filled quote so typing starts immediately.
+  useEffect(() => {
+    if (mode !== 'compose') return
+    const ta = cardRef.current?.querySelector<HTMLTextAreaElement>('textarea')
+    if (ta) {
       ta.focus({ preventScroll: true })
       ta.setSelectionRange(ta.value.length, ta.value.length)
-    })
-  }, [sel, draft, inputActions])
+    }
+  }, [mode])
+
+  const close = useCallback(() => {
+    composingRef.current = false
+    setMode('pill')
+    setSel(null)
+    setPos(null)
+    setText('')
+  }, [])
+
+  const openCompose = useCallback(() => {
+    if (!sel) return
+    composingRef.current = true
+    setText(buildQuote(sel.text) + '\n\n')
+    setMode('compose')
+    window.getSelection()?.removeAllRanges()
+  }, [sel])
+
+  const save = useCallback(() => {
+    const body = text.trim()
+    if (!body) {
+      close()
+      return
+    }
+    // Save-to-draft, never send: append the quoted comment to the resident
+    // composer so several selections can accumulate there before the user
+    // sends them in one message.
+    inputActions.setDraft(appendQuote(draft, body))
+    close()
+  }, [text, draft, inputActions, close])
+
+  const onCardKeyDown = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      save()
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      close()
+    }
+  }
 
   if (!sel) return null
 
@@ -148,16 +204,57 @@ export function SelectionAskButton({
     ? { position: 'fixed', top: pos.top, left: pos.left }
     : { position: 'fixed', top: -9999, left: -9999, opacity: 0 }
 
+  if (mode === 'compose') {
+    return (
+      <div
+        ref={cardRef}
+        className="dsa-card"
+        style={style}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <textarea
+          className="dsa-card-input"
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={onCardKeyDown}
+          placeholder="补充你的问题或评论…"
+        />
+        <div className="dsa-card-actions">
+          <span className="dsa-card-hint">
+            Enter 保存 · Shift+Enter 换行 · Esc 取消
+          </span>
+          <button
+            type="button"
+            className="dsa-card-btn"
+            // Keep the click from clearing the textarea focus.
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={close}
+          >
+            取消
+          </button>
+          <button
+            type="button"
+            className="dsa-card-btn dsa-card-btn-send"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={save}
+          >
+            保存到会话
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <button
-      ref={buttonRef}
+      ref={pillRef}
       type="button"
       className="dsa-button"
       style={style}
-      // Keep the text selection alive across the click: prevent the button
-      // from stealing focus/collapsing the selection on mousedown.
+      // Keep the text selection alive across the click: prevent the pill from
+      // stealing focus/collapsing the selection on mousedown.
       onMouseDown={(event) => event.preventDefault()}
-      onClick={writeQuote}
+      onClick={openCompose}
     >
       询问 DeepSeek
     </button>

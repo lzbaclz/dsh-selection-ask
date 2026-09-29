@@ -40,9 +40,9 @@ DeepSeek Harness is a text-first terminal/agent workspace. But quoting a piece o
 >
 > | Plugin version | Works with |
 > |---|---|
+> | `0.1.2` | DSH ≥ `0.1.5-rc.2`, including `0.2.x` |
 > | `0.1.1` | DSH ≥ `0.1.5-rc.2` |
 > | `0.1.0` | DSH `0.1.0-rc.x` (the `dsh-client-runtime` era) |
-ation
 
 > **Using the DSH Desktop app?** Run the same command in the app's built-in
 > terminal **without `--profile`** — it targets the `desktop` profile
@@ -153,9 +153,10 @@ the plugin fiber, so a hot reload never leaves stale code behind.
 
 ## Usage
 
-1. Select text anywhere in the conversation transcript.
-2. Click the **「询问 DeepSeek」** button floating beside the selection.
-3. The selection is quoted into the composer (`> selected text`), the composer is focused and the caret is at the end — type your follow-up question and send.
+1. Select text in the conversation transcript or inside an in-app document preview (a generated markdown file, for example).
+2. Click the **「询问 DeepSeek」** button floating beside the selection — it turns into a small compose card with the selection pre-quoted (`> selected text`) and the caret at the end.
+3. Type your follow-up, then hit **Enter** (or **保存到会话**) — the comment is appended onto the composer draft, never sent automatically. `Shift+Enter` inserts a newline, `Esc` discards.
+4. Quote as many spots as you like — every save accumulates on the same draft. Send once from the composer when you are done.
 
 ## Uninstall
 

@@ -1,6 +1,6 @@
 {
   "name": "dsh-selection-ask",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "ChatGPT-style text selection helper for DeepSeek Harness: select text in a conversation and a floating 「询问 DeepSeek」 button appears; click it to quote the selection into the composer.",
   "type": "module",
   "main": "lib/index.js",
@@ -45,7 +45,7 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-client-ui-conversation": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-client-ui-conversation": ">=0.1.0-rc.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -105,5 +105,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lzbaclz/dsh-selection-ask.git"
-  }
+  },
+  "packageManager": "pnpm@11.7.0+sha512.19cc852c120c7125760f2443ee6be0ca5b40f9f50598de1a09a1f177503e010e57c23c77646e01e761de59bf874fb22a3398c33ab9691fc13eb946b6f0f4d620"
 }
